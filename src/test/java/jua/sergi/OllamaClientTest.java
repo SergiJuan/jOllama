@@ -1,10 +1,11 @@
 package jua.sergi;
 
-import jua.sergi.model.EmbeddingResponse;
-import jua.sergi.model.GenerateResponse;
+import jua.sergi.manager.ModelManager;
+import jua.sergi.model.response.EmbeddingResponse;
+import jua.sergi.model.response.GenerateResponse;
 import jua.sergi.model.ModelDetails;
-import jua.sergi.model.ModelInfo;
-import jua.sergi.model.PullResponse;
+import jua.sergi.model.entity.ModelInfo;
+import jua.sergi.model.response.PullResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

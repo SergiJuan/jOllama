@@ -93,7 +93,7 @@ dependencies {
 
 ```java
 import jua.sergi.OllamaClient;
-import jua.sergi.model.GenerateResponse;
+import jua.sergi.model.response.GenerateResponse;
 
 public class Main {
 
@@ -129,18 +129,26 @@ System.out.println(response.getResponse());
 
 ```java
 import jua.sergi.OllamaClient;
-import jua.sergi.model.ChatRequest;
-import jua.sergi.model.ChatResponse;
+import jua.sergi.model.request.ChatRequest;
+import jua.sergi.model.response.ChatResponse;
 
 OllamaClient client = OllamaClient.builder().build();
 
 ChatRequest request = new ChatRequest("llama3");
-request.addMessage("system", "You are a helpful assistant.");
-request.addMessage("user", "Hello! Explain Java in one sentence.");
+request.
+
+addMessage("system","You are a helpful assistant.");
+request.
+
+addMessage("user","Hello! Explain Java in one sentence.");
 
 ChatResponse response = client.chat(request);
 
-System.out.println(response.getMessage().getContent());
+System.out.
+
+println(response.getMessage().
+
+getContent());
 ```
 
 You can build full conversation history by chaining messages:

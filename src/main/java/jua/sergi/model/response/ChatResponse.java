@@ -1,4 +1,6 @@
-package jua.sergi.model;
+package jua.sergi.model.response;
+
+import jua.sergi.model.entity.Message;
 
 /**
  * Response returned from /api/chat.

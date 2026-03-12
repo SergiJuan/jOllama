@@ -1,12 +1,12 @@
-package jua.sergi;
+package jua.sergi.manager;
 
 import jua.sergi.http.HttpClient;
 import jua.sergi.http.JavaHttpClient;
 import jua.sergi.model.ModelDetails;
-import jua.sergi.model.ModelInfo;
-import jua.sergi.model.ModelListResponse;
-import jua.sergi.model.PullRequest;
-import jua.sergi.model.PullResponse;
+import jua.sergi.model.entity.ModelInfo;
+import jua.sergi.model.response.ModelListResponse;
+import jua.sergi.model.request.PullRequest;
+import jua.sergi.model.response.PullResponse;
 
 import java.util.HashMap;
 import java.util.List;

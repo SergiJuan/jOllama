@@ -1,4 +1,4 @@
-package jua.sergi.model;
+package jua.sergi.model.request;
 
 /**
  * Request sent to /api/embeddings.

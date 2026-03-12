@@ -1,12 +1,13 @@
 package jua.sergi;
 
 import jua.sergi.http.HttpClient;
-import jua.sergi.model.ChatRequest;
-import jua.sergi.model.ChatResponse;
-import jua.sergi.model.EmbeddingRequest;
-import jua.sergi.model.EmbeddingResponse;
-import jua.sergi.model.GenerateRequest;
-import jua.sergi.model.GenerateResponse;
+import jua.sergi.http.JavaHttpClient;
+import jua.sergi.model.request.ChatRequest;
+import jua.sergi.model.request.EmbeddingRequest;
+import jua.sergi.model.request.GenerateRequest;
+import jua.sergi.model.response.ChatResponse;
+import jua.sergi.model.response.EmbeddingResponse;
+import jua.sergi.model.response.GenerateResponse;
 
 import java.util.function.Consumer;
 
@@ -16,22 +17,35 @@ import java.util.function.Consumer;
  * <p>This class exposes high level methods for interacting
  * with Ollama models such as text generation, chat and embeddings.</p>
  *
- * <p>Use {@link #builder()} to create and configure an instance.</p>
+ * <p>Use {@link #builder()} to create and configure an instance:</p>
+ *
+ * <pre>{@code
+ * OllamaClient client = OllamaClient.builder()
+ *         .host("http://localhost:11434")
+ *         .build();
+ * }</pre>
  */
 public class OllamaClient {
 
     private final String host;
     private final HttpClient httpClient;
 
-    OllamaClient(String host, HttpClient httpClient) {
-        this.host = host;
-        this.httpClient = httpClient;
+    private OllamaClient(Builder builder) {
+        this.host = builder.host;
+        this.httpClient = builder.httpClient;
     }
+
+    // -------------------------------------------------------------------------
+    // API methods
+    // -------------------------------------------------------------------------
 
     /**
      * Generates text using the Ollama /api/generate endpoint.
      *
-     * @param model  model name
+     * <p>Blocking call — waits for the full response before returning.
+     * For token-by-token output use {@link #generateStreaming} instead.</p>
+     *
+     * @param model  model name (e.g. "llama3")
      * @param prompt prompt text
      * @return complete generation response
      */
@@ -57,7 +71,7 @@ public class OllamaClient {
      * });
      * }</pre>
      *
-     * @param model   model name
+     * @param model   model name (e.g. "llama3")
      * @param prompt  prompt text
      * @param onChunk consumer called for each received token chunk
      */
@@ -90,8 +104,8 @@ public class OllamaClient {
      * Generates an embedding vector for the given text via /api/embeddings.
      *
      * <p>Embeddings are numeric vectors that represent the semantic meaning
-     * of a text. They are useful for similarity search, RAG pipelines,
-     * clustering, and classification tasks.</p>
+     * of a text. Useful for similarity search, RAG pipelines,
+     * clustering and classification tasks.</p>
      *
      * <pre>{@code
      * EmbeddingResponse r1 = client.embed("llama3", "The cat sat on the mat");
@@ -101,7 +115,7 @@ public class OllamaClient {
      * System.out.println("Similarity: " + similarity); // close to 1.0
      * }</pre>
      *
-     * @param model  model name
+     * @param model  model name (e.g. "llama3")
      * @param prompt text to embed
      * @return embedding response containing the vector
      */
@@ -115,10 +129,68 @@ public class OllamaClient {
         );
     }
 
+    // -------------------------------------------------------------------------
+    // Builder
+    // -------------------------------------------------------------------------
+
     /**
-     * Creates a new builder instance.
+     * Creates a new {@link Builder} instance.
      */
-    public static OllamaClientBuilder builder() {
-        return new OllamaClientBuilder();
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Builder used to configure and create an {@link OllamaClient}.
+     *
+     * <pre>{@code
+     * OllamaClient client = OllamaClient.builder()
+     *         .host("http://my-server:11434")
+     *         .httpClient(myCustomHttpClient)
+     *         .build();
+     * }</pre>
+     */
+    public static class Builder {
+
+        private String host = "http://localhost:11434";
+        private HttpClient httpClient;
+
+        private Builder() {
+        }
+
+        /**
+         * Sets the Ollama server host. Defaults to {@code http://localhost:11434}.
+         *
+         * @param host server base URL
+         * @return this builder
+         */
+        public Builder host(String host) {
+            this.host = host;
+            return this;
+        }
+
+        /**
+         * Sets a custom {@link HttpClient} implementation.
+         * Useful for testing or custom networking needs.
+         *
+         * @param httpClient custom HTTP client
+         * @return this builder
+         */
+        public Builder httpClient(HttpClient httpClient) {
+            this.httpClient = httpClient;
+            return this;
+        }
+
+        /**
+         * Builds and returns a configured {@link OllamaClient}.
+         *
+         * @return new OllamaClient instance
+         */
+        public OllamaClient build() {
+            if (httpClient == null) {
+                httpClient = new JavaHttpClient();
+            }
+            return new OllamaClient(this);
+        }
     }
 }

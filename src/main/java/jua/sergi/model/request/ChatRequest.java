@@ -1,4 +1,6 @@
-package jua.sergi.model;
+package jua.sergi.model.request;
+
+import jua.sergi.model.entity.Message;
 
 import java.util.ArrayList;
 import java.util.List;

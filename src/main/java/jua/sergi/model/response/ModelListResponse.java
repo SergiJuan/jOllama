@@ -1,6 +1,7 @@
-package jua.sergi.model;
+package jua.sergi.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jua.sergi.model.entity.ModelInfo;
 
 import java.util.List;
 

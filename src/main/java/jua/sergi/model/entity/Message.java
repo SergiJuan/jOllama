@@ -1,4 +1,4 @@
-package jua.sergi.model;
+package jua.sergi.model.entity;
 
 /**
  * Represents a chat message in a conversation.

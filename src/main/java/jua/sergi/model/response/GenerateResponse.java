@@ -1,4 +1,4 @@
-package jua.sergi.model;
+package jua.sergi.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
