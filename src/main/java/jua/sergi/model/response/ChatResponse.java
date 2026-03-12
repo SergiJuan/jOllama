@@ -1,10 +1,12 @@
 package jua.sergi.model.response;
 
 import jua.sergi.model.entity.Message;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Response returned from /api/chat.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatResponse {
 
     private Message message;
