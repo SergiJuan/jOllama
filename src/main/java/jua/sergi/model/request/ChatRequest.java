@@ -1,7 +1,6 @@
 package jua.sergi.model.request;
 
 import jua.sergi.model.entity.Message;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +8,9 @@ import java.util.List;
  * Chat request sent to /api/chat.
  */
 public class ChatRequest {
-
     private String model;
     private List<Message> messages = new ArrayList<>();
+    private boolean stream = false;
 
     public ChatRequest() {}
 
@@ -31,8 +30,15 @@ public class ChatRequest {
         return messages;
     }
 
+    public boolean isStream() {
+        return stream;
+    }
+
     public void setModel(String model) {
         this.model = model;
     }
 
+    public void setStream(boolean stream) {
+        this.stream = stream;
+    }
 }
