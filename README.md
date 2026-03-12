@@ -215,7 +215,7 @@ jua.sergi
 - [x] Chat API (`/api/chat`)
 - [x] Builder pattern configuration
 - [x] Custom HTTP client support
-- [ ] Streaming responses
+- [x] Streaming responses
 - [ ] Async API with `CompletableFuture`
 - [ ] Embeddings API (`/api/embeddings`)
 - [ ] Model management (list, pull, create, delete)
