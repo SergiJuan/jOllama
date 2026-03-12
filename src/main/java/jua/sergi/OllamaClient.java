@@ -87,6 +87,31 @@ public class OllamaClient {
     }
 
     /**
+    * Sends a chat request to Ollama via /api/chat with streaming.
+    *
+    * <p>Each token is delivered to the {@code onChunk} consumer
+    * as it arrives. The final chunk will have {@code isDone() == true}.</p>
+    *
+    * <pre>{@code
+    * client.chatStreaming(request, chunk -> {
+    *     System.out.print(chunk.getMessage().getContent());
+    * });
+    * }</pre>
+    *
+    * @param request chat request with model and message history
+    * @param onChunk consumer called for each received token chunk
+    */
+    public void chatStreaming(ChatRequest request, Consumer<ChatResponse> onChunk) {
+        request.setStream(true);
+        httpClient.stream(
+                host + "/api/chat",
+                request,
+                ChatResponse.class,
+                onChunk
+        );
+    }
+
+    /**
      * Sends a chat request to Ollama via /api/chat.
      *
      * @param request chat request with model and message history
