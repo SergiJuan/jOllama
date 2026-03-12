@@ -11,5 +11,8 @@ public interface HttpClient {
 
     <T> void stream(String url, Object body, Class<T> responseType, Consumer<T> onChunk);
 
+    <T> T get(String url, Class<T> responseType);
+
+    void delete(String url, Object body);
 
 }

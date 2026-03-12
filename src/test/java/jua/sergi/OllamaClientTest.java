@@ -2,7 +2,12 @@ package jua.sergi;
 
 import jua.sergi.model.EmbeddingResponse;
 import jua.sergi.model.GenerateResponse;
+import jua.sergi.model.ModelDetails;
+import jua.sergi.model.ModelInfo;
+import jua.sergi.model.PullResponse;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 public class OllamaClientTest {
 
@@ -49,4 +54,50 @@ public class OllamaClientTest {
         System.out.printf("Similarity (cat vs java): %.4f%n", sim13);
     }
 
+    @Test
+    public void testListModels() {
+
+        ModelManager manager = ModelManager.builder().build();
+
+        List<ModelInfo> models = manager.list();
+
+        System.out.println("Installed models:");
+        models.forEach(m -> System.out.println(" - " + m));
+    }
+
+    @Test
+    public void testShowModel() {
+
+        ModelManager manager = ModelManager.builder().build();
+
+        ModelDetails details = manager.show("llama3");
+
+        System.out.println("Parameters: " + details.getParameters());
+
+        if (details.getModelInfo() != null) {
+            System.out.println("Architecture: " + details.getModelInfo().getArchitecture());
+            System.out.println("Param count:  " + details.getModelInfo().getParameterCount());
+        }
+    }
+
+    @Test
+    public void testPullModel() {
+
+        ModelManager manager = ModelManager.builder().build();
+
+        PullResponse response = manager.pull("llama3");
+
+        System.out.println("Pull status: " + response.getStatus());
+        System.out.println("Success: " + response.isSuccess());
+    }
+
+    @Test
+    public void testDeleteModel() {
+
+        ModelManager manager = ModelManager.builder().build();
+
+        manager.delete("llama3");
+
+        System.out.println("Model deleted successfully");
+    }
 }

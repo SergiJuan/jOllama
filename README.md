@@ -218,7 +218,7 @@ jua.sergi
 - [x] Streaming responses
 - [ ] Async API with `CompletableFuture`
 - [x] Embeddings API (`/api/embeddings`)
-- [ ] Model management (list, pull, create, delete)
+- [x] Model management (list, pull, create, delete)
 - [ ] Spring Boot integration
 
 ---

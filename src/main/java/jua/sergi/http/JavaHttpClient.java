@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 /**
  * Default HTTP client implementation using Java 11 HttpClient.
- * Supports both standard blocking requests and NDJSON streaming.
+ * Supports GET, POST, DELETE and NDJSON streaming.
  */
 public class JavaHttpClient implements HttpClient {
 
@@ -47,24 +47,10 @@ public class JavaHttpClient implements HttpClient {
             return mapper.readValue(response.body(), responseType);
 
         } catch (IOException | InterruptedException e) {
-            throw new OllamaException("Failed request", e);
+            throw new OllamaException("Failed POST request", e);
         }
     }
 
-    /**
-     * Sends a streaming POST request and delivers each NDJSON line
-     * as a parsed object to the provided consumer.
-     *
-     * <p>Ollama streams responses as newline-delimited JSON (NDJSON),
-     * where each line is a complete JSON object. This method reads
-     * the response line by line and deserializes each chunk.</p>
-     *
-     * @param url          endpoint URL
-     * @param body         request body (will be serialized to JSON)
-     * @param responseType class to deserialize each chunk into
-     * @param onChunk      consumer called for each received chunk
-     * @param <T>          response chunk type
-     */
     @Override
     public <T> void stream(String url, Object body, Class<T> responseType, Consumer<T> onChunk) {
         try {
@@ -95,6 +81,52 @@ public class JavaHttpClient implements HttpClient {
 
         } catch (IOException | InterruptedException e) {
             throw new OllamaException("Failed streaming request", e);
+        }
+    }
+
+    @Override
+    public <T> T get(String url, Class<T> responseType) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new OllamaException("HTTP error: " + response.statusCode());
+            }
+
+            return mapper.readValue(response.body(), responseType);
+
+        } catch (IOException | InterruptedException e) {
+            throw new OllamaException("Failed GET request", e);
+        }
+    }
+
+    @Override
+    public void delete(String url, Object body) {
+        try {
+            String json = mapper.writeValueAsString(body);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .method("DELETE", HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new OllamaException("HTTP error: " + response.statusCode());
+            }
+
+        } catch (IOException | InterruptedException e) {
+            throw new OllamaException("Failed DELETE request", e);
         }
     }
 }
