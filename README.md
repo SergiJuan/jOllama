@@ -67,7 +67,7 @@ A simple Java client for interacting with the Ollama API and local LLMs.
 <dependency>
     <groupId>com.github.SergiJuan</groupId>
     <artifactId>jOllama</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ```
 
@@ -83,7 +83,7 @@ dependencyResolutionManagement {
 }
 
 dependencies {
-    implementation 'com.github.SergiJuan:jOllama:0.0.1'
+    implementation 'com.github.SergiJuan:jOllama:0.0.2'
 }
 ```
 
@@ -202,17 +202,28 @@ Full API documentation is available through Javadoc comments in the source code.
 
 ```
 jua.sergi
- ├── OllamaClient          # Main client entry point
- ├── OllamaClientBuilder   # Builder for client configuration
+ ├── OllamaClient                   # Main client entry point (includes Builder as inner class)
  ├── http
- │    ├── HttpClient        # HTTP client interface
- │    └── JavaHttpClient    # Default implementation (Java 11 HttpClient)
+ │    ├── HttpClient                 # HTTP client interface (post, get, delete, stream)
+ │    └── JavaHttpClient             # Default implementation (Java 11 HttpClient)
+ ├── manager
+ │    └── ModelManager               # Model management (list, pull, delete, show)
  └── model
-      ├── GenerateRequest   # Request model for /api/generate
-      ├── GenerateResponse  # Response model for /api/generate
-      ├── ChatRequest       # Request model for /api/chat
-      ├── ChatResponse      # Response model for /api/chat
-      └── Message           # Chat message (role + content)
+      ├── entity
+      │    ├── Message               # Chat message (role + content)
+      │    └── ModelInfo             # Installed model metadata
+      ├── request
+      │    ├── GenerateRequest       # Request model for /api/generate
+      │    ├── ChatRequest           # Request model for /api/chat
+      │    ├── EmbeddingRequest      # Request model for /api/embeddings
+      │    └── PullRequest           # Request model for /api/pull
+      └── response
+           ├── GenerateResponse      # Response model for /api/generate
+           ├── ChatResponse          # Response model for /api/chat
+           ├── EmbeddingResponse     # Response model for /api/embeddings (includes cosineSimilarity)
+           ├── ModelDetails          # Detailed model info from /api/show
+           ├── ModelListResponse     # Wrapper for /api/tags response
+           └── PullResponse          # Response model for /api/pull
 ```
 
 ---
