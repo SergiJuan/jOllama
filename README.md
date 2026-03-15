@@ -11,7 +11,7 @@ A simple Java client for interacting with the Ollama API and local LLMs.
 
 ![Java](https://img.shields.io/badge/Java-11+-orange)
 ![GitHub last commit](https://img.shields.io/github/last-commit/SergiJuan/jOllama?color=green)
-![JitPack](https://img.shields.io/jitpack/version/com.github.SergiJuan/jOllama)
+![JitPack](https://jitpack.io/v/SergiJuan/jOllama.svg)
 ![GitHub License](https://img.shields.io/github/license/SergiJuan/jOllama)
 
 </div>
