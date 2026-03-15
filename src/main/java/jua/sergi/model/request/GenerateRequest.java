@@ -1,53 +1,39 @@
 package jua.sergi.model.request;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jua.sergi.model.Options;
+
 /**
  * Request sent to /api/generate.
- *
- * <p>Set {@code stream = true} when using
- * {@link jua.sergi.OllamaClient#generateStreaming} to receive
- * partial responses as they are generated.</p>
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GenerateRequest {
 
     private String model;
     private String prompt;
+    private String system;
     private boolean stream = false;
+    private Options options;
 
-    public GenerateRequest() {
-    }
-
-    public GenerateRequest(String model, String prompt) {
-        this.model = model;
-        this.prompt = prompt;
-    }
+    public GenerateRequest() {}
 
     public GenerateRequest(String model, String prompt, boolean stream) {
-        this.model = model;
+        if (model == null || model.isBlank())
+            throw new IllegalArgumentException("model must not be null or blank");
+        this.model  = model;
         this.prompt = prompt;
         this.stream = stream;
     }
 
-    public String getModel() {
-        return model;
-    }
+    public String getModel()      { return model; }
+    public String getPrompt()     { return prompt; }
+    public String getSystem()     { return system; }
+    public boolean isStream()     { return stream; }
+    public Options getOptions()   { return options; }
 
-    public String getPrompt() {
-        return prompt;
-    }
-
-    public boolean isStream() {
-        return stream;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public void setPrompt(String prompt) {
-        this.prompt = prompt;
-    }
-
-    public void setStream(boolean stream) {
-        this.stream = stream;
-    }
+    public void setModel(String model)       { this.model   = model; }
+    public void setPrompt(String prompt)     { this.prompt  = prompt; }
+    public void setSystem(String system)     { this.system  = system; }
+    public void setStream(boolean stream)    { this.stream  = stream; }
+    public void setOptions(Options options)  { this.options = options; }
 }

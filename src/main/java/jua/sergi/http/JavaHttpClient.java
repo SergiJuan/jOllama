@@ -1,6 +1,7 @@
 package jua.sergi.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import jua.sergi.exception.OllamaException;
 
 import java.io.BufferedReader;
@@ -13,8 +14,8 @@ import java.net.http.HttpResponse;
 import java.util.function.Consumer;
 
 /**
- * Default HTTP client implementation using Java 11 HttpClient.
- * Supports GET, POST, DELETE and NDJSON streaming.
+ * Default HTTP client using Java 11 HttpClient.
+ * Accepts any 2xx status code as success.
  */
 public class JavaHttpClient implements HttpClient {
 
@@ -23,30 +24,29 @@ public class JavaHttpClient implements HttpClient {
 
     public JavaHttpClient() {
         this.client = java.net.http.HttpClient.newHttpClient();
-        this.mapper = new ObjectMapper();
+        this.mapper = new ObjectMapper()
+                .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
     @Override
     public <T> T post(String url, Object body, Class<T> responseType) {
         try {
-            String json = mapper.writeValueAsString(body);
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
                     .build();
 
             HttpResponse<String> response =
                     client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
-                throw new OllamaException("HTTP error: " + response.statusCode());
-            }
-
+            assertSuccess(response.statusCode(), response.body());
             return mapper.readValue(response.body(), responseType);
 
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();           // ← restore flag
+            throw new OllamaException("POST request interrupted", e);
+        } catch (IOException e) {
             throw new OllamaException("Failed POST request", e);
         }
     }
@@ -54,32 +54,31 @@ public class JavaHttpClient implements HttpClient {
     @Override
     public <T> void stream(String url, Object body, Class<T> responseType, Consumer<T> onChunk) {
         try {
-            String json = mapper.writeValueAsString(body);
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
                     .build();
 
             HttpResponse<InputStream> response =
                     client.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if (response.statusCode() != 200) {
-                throw new OllamaException("HTTP error: " + response.statusCode());
-            }
+            assertSuccess(response.statusCode(), null);
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body()))) {
+            try (BufferedReader reader =
+                         new BufferedReader(new InputStreamReader(response.body()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (!line.isBlank()) {
-                        T chunk = mapper.readValue(line, responseType);
-                        onChunk.accept(chunk);
+                        onChunk.accept(mapper.readValue(line, responseType));
                     }
                 }
             }
 
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new OllamaException("Stream request interrupted", e);
+        } catch (IOException e) {
             throw new OllamaException("Failed streaming request", e);
         }
     }
@@ -96,13 +95,13 @@ public class JavaHttpClient implements HttpClient {
             HttpResponse<String> response =
                     client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
-                throw new OllamaException("HTTP error: " + response.statusCode());
-            }
-
+            assertSuccess(response.statusCode(), response.body());
             return mapper.readValue(response.body(), responseType);
 
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new OllamaException("GET request interrupted", e);
+        } catch (IOException e) {
             throw new OllamaException("Failed GET request", e);
         }
     }
@@ -110,23 +109,35 @@ public class JavaHttpClient implements HttpClient {
     @Override
     public void delete(String url, Object body) {
         try {
-            String json = mapper.writeValueAsString(body);
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Content-Type", "application/json")
-                    .method("DELETE", HttpRequest.BodyPublishers.ofString(json))
+                    .method("DELETE",
+                            HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
                     .build();
 
             HttpResponse<String> response =
                     client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
-                throw new OllamaException("HTTP error: " + response.statusCode());
-            }
+            assertSuccess(response.statusCode(), response.body());
 
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new OllamaException("DELETE request interrupted", e);
+        } catch (IOException e) {
             throw new OllamaException("Failed DELETE request", e);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /** Throws OllamaException for any non-2xx status. */
+    private void assertSuccess(int statusCode, String body) {
+        if (statusCode < 200 || statusCode >= 300) {
+            String detail = body != null ? " — " + body : "";
+            throw new OllamaException("HTTP error " + statusCode + detail);
         }
     }
 }

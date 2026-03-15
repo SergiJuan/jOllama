@@ -1,6 +1,7 @@
 package jua.sergi;
 
 import jua.sergi.manager.ModelManager;
+import jua.sergi.model.Options;
 import jua.sergi.model.response.EmbeddingResponse;
 import jua.sergi.model.response.GenerateResponse;
 import jua.sergi.model.ModelDetails;
@@ -9,6 +10,8 @@ import jua.sergi.model.response.PullResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class OllamaClientTest {
 
@@ -21,6 +24,22 @@ public class OllamaClientTest {
                 client.generate("llama3", "Say hello");
 
         System.out.println(response.getResponse());
+    }
+
+    @Test
+    public void testGenerateWithOptions() {
+        OllamaClient client = OllamaClient.builder().build();
+
+        Options opts = Options.builder()
+                .temperature(0.5)
+                .numPredict(25)
+                .build();
+
+        client.generateStreaming("llama3", "Count from 1 to 5", opts, chunk -> {
+            System.out.print(chunk.getResponse());
+        });
+
+        System.out.println();
     }
 
     @Test
