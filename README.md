@@ -67,7 +67,7 @@ A simple Java client for interacting with the Ollama API and local LLMs.
 <dependency>
     <groupId>com.github.SergiJuan</groupId>
     <artifactId>jOllama</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 
@@ -83,7 +83,7 @@ dependencyResolutionManagement {
 }
 
 dependencies {
-    implementation 'com.github.SergiJuan:jOllama:0.0.2'
+    implementation 'com.github.SergiJuan:jOllama:0.0.3'
 }
 ```
 
